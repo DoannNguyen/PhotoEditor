@@ -1,6 +1,7 @@
 package com.example.photoeditor.adapters
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,9 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.photoeditor.R
+import com.example.photoeditor.interfaces.IOnItemClickListener
 
-class ImageAdapter (private val images :ArrayList<String>, private var count : Int) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
+class ImageAdapter ( private val images :ArrayList<String>, private var count : Int, private val click: IOnItemClickListener) : RecyclerView.Adapter<ImageAdapter.ViewHolder>() {
 
     private val checkedItems = BooleanArray(images.size)
     private var isCheckboxVisible = false
@@ -39,6 +41,8 @@ class ImageAdapter (private val images :ArrayList<String>, private var count : I
                 if (isCheckboxVisible) {
                     cb.isChecked = !cb.isChecked
                     count = if (cb.isChecked) count + 1 else count - 1
+                }else{
+                    click.onClick(adapterPosition)
                 }
                 if (count == 0){
                     isCheckboxVisible = false

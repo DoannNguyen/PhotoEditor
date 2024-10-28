@@ -4,4 +4,6 @@
     <string name="start_record">Start</string>
     <string name="stop_record">Stop</string>
     <string name="title_toolbar_list_image">Images</string>
+    <string name="title_toolbar_edit_image">Editor</string>
+    <string name="choose_image">Choose image</string>
 </resources>

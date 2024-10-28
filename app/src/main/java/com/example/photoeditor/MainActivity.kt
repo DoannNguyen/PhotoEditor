@@ -3,6 +3,7 @@ package com.example.photoeditor
 import android.content.pm.PackageManager
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.os.Build
@@ -87,7 +88,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private val REQUIRED_PERMISSIONS =
+         val REQUIRED_PERMISSIONS =
             mutableListOf (
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO
@@ -139,6 +140,11 @@ class MainActivity : AppCompatActivity() {
                         onImageSaved(output: ImageCapture.OutputFileResults){
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                    setResult(Activity.RESULT_OK, Intent().apply {
+                        data = output.savedUri
+                    })
+                    Log.e("TAG", "onImageSaved: ${output.savedUri}", )
+                    finish()
                     Log.d(TAG, msg)
                 }
             }
@@ -199,7 +205,6 @@ class MainActivity : AppCompatActivity() {
                                     "${recordEvent.outputResults.outputUri}"
                             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT)
                                 .show()
-                            Log.d(TAG, msg)
                         } else {
                             recording?.close()
                             recording = null
@@ -272,39 +277,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val activityResultLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions())
-        { permissions ->
-            // Handle Permission granted/rejected
-            var permissionGranted = true
-            permissions.entries.forEach {
-                if (it.key in REQUIRED_PERMISSIONS && !it.value)
-                    permissionGranted = false
-            }
-            if (!permissionGranted) {
-                Toast.makeText(baseContext, "Permission request denied", Toast.LENGTH_SHORT).show()
-            } else {
-                startCamera()
-            }
+    { permissions ->
+        // Handle Permission granted/rejected
+        var permissionGranted = true
+        permissions.entries.forEach {
+            if (it.key in REQUIRED_PERMISSIONS && !it.value)
+                permissionGranted = false
         }
-
-    private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
-
-        private fun ByteBuffer.toByteArray(): ByteArray {
-            rewind()    // Rewind the buffer to zero
-            val data = ByteArray(remaining())
-            get(data)   // Copy the buffer into a byte array
-            return data // Return the byte array
-        }
-
-        override fun analyze(image: ImageProxy) {
-
-            val buffer = image.planes[0].buffer
-            val data = buffer.toByteArray()
-            val pixels = data.map { it.toInt() and 0xFF }
-            val luma = pixels.average()
-
-            listener(luma)
-
-            image.close()
+        if (!permissionGranted) {
+            Toast.makeText(baseContext, "Permission request denied", Toast.LENGTH_SHORT).show()
+        } else {
+            startCamera()
         }
     }
 }
