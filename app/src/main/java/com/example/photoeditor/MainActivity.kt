@@ -3,7 +3,6 @@ package com.example.photoeditor
 import android.content.pm.PackageManager
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.os.Build
@@ -15,10 +14,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.MediaStoreOutputOptions
@@ -33,13 +30,10 @@ import androidx.core.content.PermissionChecker
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.photoeditor.databinding.ActivityMainBinding
-import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-typealias LumaListener = (luma: Double) -> Unit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -140,12 +134,10 @@ class MainActivity : AppCompatActivity() {
                         onImageSaved(output: ImageCapture.OutputFileResults){
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    setResult(Activity.RESULT_OK, Intent().apply {
+                    setResult( 1 , Intent().apply {
                         data = output.savedUri
                     })
-                    Log.e("TAG", "onImageSaved: ${output.savedUri}", )
                     finish()
-                    Log.d(TAG, msg)
                 }
             }
         )

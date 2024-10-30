@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginBottom="75sp">
+        android:layout_marginBottom="120sp">
         <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,56 +24,83 @@
                 android:textSize="16sp"
                 />
         </androidx.appcompat.widget.Toolbar>
-        <ImageView
+
+        <com.example.photoeditor.views.FlexibleImageView
+            android:layout_gravity="center"
             android:id="@+id/img_preview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="70sp"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:layout_height="120sp"
+        android:orientation="vertical"
+        android:layout_gravity="bottom"
+        >
         <LinearLayout
-            android:id="@+id/layout_chooseImage"
-            android:layout_width="0sp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1"
+            android:orientation="horizontal"
             android:gravity="center">
-            <ImageView
+            <ImageButton
+                android:id="@+id/btn_crop"
                 android:layout_width="48sp"
                 android:layout_height="48sp"
-                android:src="@drawable/photo"
+                android:background="@drawable/crop"
+                android:layout_marginHorizontal="5sp"
                 />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/choose_image"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/layout_takePicture"
-            android:layout_width="0sp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1"
-            android:gravity="center">
-            <ImageView
+            <ImageButton
+                android:id="@+id/btn_draw"
                 android:layout_width="48sp"
                 android:layout_height="48sp"
-                android:src="@drawable/camera1"
+                android:background="@drawable/draw"
+                android:layout_marginHorizontal="5sp"
                 />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/take_picture"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/layout_chooseImage"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
+                    android:src="@drawable/photo"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/choose_image"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/layout_takePicture"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
+                    android:src="@drawable/camera1"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/take_picture"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
 
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

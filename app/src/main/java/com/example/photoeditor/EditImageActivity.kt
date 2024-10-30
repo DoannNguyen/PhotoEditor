@@ -4,30 +4,71 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Rect
+import androidx.exifinterface.media.ExifInterface
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.photoeditor.MainActivity.Companion.REQUIRED_PERMISSIONS
 import com.example.photoeditor.databinding.ActivityEditImageBinding
+import com.example.photoeditor.views.FlexibleImageView
+import java.io.File
+import java.io.InputStream
 
 class EditImageActivity : AppCompatActivity() {
+    private var bitmap: Bitmap? = null
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result ->
         if(result.resultCode == Activity.RESULT_OK){
             val data = result.data?.data
-            Log.e("TAG", ": data $result", )
-            binding.imgPreview.setImageURI(Uri.parse(data.toString()))
+            var inputStream: InputStream? = null
+            try {
+                inputStream = contentResolver.openInputStream(File(data.toString()).toUri())
+                bitmap = BitmapFactory.decodeStream(inputStream)
+                val orientation = 6
+                val adjustedBitmap = rotateBitmap(bitmap!!, orientation)
+                binding.imgPreview.setBitmap(adjustedBitmap)
+                binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
+            } catch (e: Exception) {
+                Log.e("TAG", "Error loading image: ${e.message}")
+            }finally {
+                inputStream?.close()
+            }
+
+        }else{
+            val data = result.data?.data
+            bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(data!!))
+            val inputStream = contentResolver.openInputStream(data.toString().toUri())
+            val exif = ExifInterface(inputStream!!)
+            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            val adjustedBitmap = rotateBitmap(bitmap!!, orientation)
+            binding.imgPreview.setBitmap(adjustedBitmap)
+            binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
         }
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, orientation: Int): Bitmap {
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+        }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
     private lateinit var binding: ActivityEditImageBinding
@@ -50,6 +91,8 @@ class EditImageActivity : AppCompatActivity() {
             resultLauncher.launch(intent)
         }
 
+
+
         binding.layoutTakePicture.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             resultLauncher.launch(intent)
@@ -57,6 +100,19 @@ class EditImageActivity : AppCompatActivity() {
 
         if (!allPermissionsGranted()) {
             requestPermissions()
+        }
+
+        binding.btnCrop.setOnClickListener {
+            if(bitmap != null){
+                binding.imgPreview.setMode(FlexibleImageView.Mode.CROP)
+            }
+        }
+
+        binding.btnDraw.setOnClickListener {
+            if(bitmap != null){
+
+                binding.imgPreview.setMode(FlexibleImageView.Mode.DRAW)
+            }
         }
 
     }
