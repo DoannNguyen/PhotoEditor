@@ -1,10 +1,13 @@
 package com.example.photoeditor
 
 import android.app.Activity
+import android.content.ContentUris
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -32,9 +35,15 @@ class ImagesActivity : AppCompatActivity() {
 
         binding.rcvImages.adapter = ImageAdapter(getImagesPath(this), count, object : IOnItemClickListener {
             override fun onClick(position: Int) {
-                setResult(Activity.RESULT_OK, Intent().apply {
-                    data = Uri.parse(getImagesPath(this@ImagesActivity)[position])
-                })
+                try {
+                    setResult(Activity.RESULT_OK, Intent().apply {
+                        data = getUriFromFilePath(getImagesPath(this@ImagesActivity)[position])
+                    })
+                }catch (e: Exception){
+                    e.printStackTrace()
+                }
+
+
 
                 finish()
             }
@@ -62,5 +71,26 @@ class ImagesActivity : AppCompatActivity() {
         return imagesPath
     }
 
+    private fun getUriFromFilePath(filePath: String): Uri? {
+        val projection = arrayOf(MediaStore.Images.Media._ID)
+        val selection = "${MediaStore.Images.Media.DATA} = ?"
+        val selectionArgs = arrayOf(filePath)
+
+        val cursor = contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            selection,
+            selectionArgs,
+            null
+        )
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val id = it.getLong(it.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+                return ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            }
+        }
+        return null
+    }
 
 }

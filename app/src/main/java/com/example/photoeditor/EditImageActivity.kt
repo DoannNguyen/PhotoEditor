@@ -2,19 +2,19 @@ package com.example.photoeditor
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.Rect
-import androidx.exifinterface.media.ExifInterface
+import android.media.ExifInterface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,8 +25,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.photoeditor.databinding.ActivityEditImageBinding
 import com.example.photoeditor.views.FlexibleImageView
-import java.io.File
-import java.io.InputStream
+import java.io.FileNotFoundException
+
 
 class EditImageActivity : AppCompatActivity() {
     private var bitmap: Bitmap? = null
@@ -34,30 +34,24 @@ class EditImageActivity : AppCompatActivity() {
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
             result ->
         if(result.resultCode == Activity.RESULT_OK){
-            val data = result.data?.data
-            var inputStream: InputStream? = null
             try {
-                inputStream = contentResolver.openInputStream(File(data.toString()).toUri())
-                bitmap = BitmapFactory.decodeStream(inputStream)
-                val orientation = 6
+                val data = result.data?.data
+                bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(data!!))
+                val inputStream = contentResolver.openInputStream(data.toString().toUri())
+                val exif = ExifInterface(inputStream!!)
+                val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
                 val adjustedBitmap = rotateBitmap(bitmap!!, orientation)
                 binding.imgPreview.setBitmap(adjustedBitmap)
                 binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
+
+            } catch (e: FileNotFoundException) {
+                Log.e("TAG", "File not found: ${e.message}")
             } catch (e: Exception) {
-                Log.e("TAG", "Error loading image: ${e.message}")
-            }finally {
-                inputStream?.close()
+                Log.e("TAG", "Error opening input stream: ${e.message}")
             }
 
         }else{
-            val data = result.data?.data
-            bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(data!!))
-            val inputStream = contentResolver.openInputStream(data.toString().toUri())
-            val exif = ExifInterface(inputStream!!)
-            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-            val adjustedBitmap = rotateBitmap(bitmap!!, orientation)
-            binding.imgPreview.setBitmap(adjustedBitmap)
-            binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
+            Toast.makeText(baseContext, "Photo capture failed", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -70,6 +64,9 @@ class EditImageActivity : AppCompatActivity() {
         }
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
+
+
+
 
     private lateinit var binding: ActivityEditImageBinding
 
@@ -104,15 +101,27 @@ class EditImageActivity : AppCompatActivity() {
 
         binding.btnCrop.setOnClickListener {
             if(bitmap != null){
+                binding.btnDoneCrop.visibility = View.VISIBLE
                 binding.imgPreview.setMode(FlexibleImageView.Mode.CROP)
             }
         }
 
         binding.btnDraw.setOnClickListener {
             if(bitmap != null){
-
+                binding.btnDoneDraw.visibility = View.VISIBLE
                 binding.imgPreview.setMode(FlexibleImageView.Mode.DRAW)
             }
+        }
+
+        binding.btnDoneDraw.setOnClickListener {
+            binding.imgPreview.setAction(FlexibleImageView.Action.SaveDrawing)
+            binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
+            binding.btnDoneDraw.visibility = View.GONE
+        }
+        binding.btnDoneCrop.setOnClickListener {
+            binding.imgPreview.setAction(FlexibleImageView.Action.SaveCropped)
+            binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
+            binding.btnDoneCrop.visibility = View.GONE
         }
 
     }

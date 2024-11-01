@@ -3,12 +3,19 @@ package com.example.photoeditor
 import android.content.pm.PackageManager
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.media.ExifInterface
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Surface
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,6 +37,8 @@ import androidx.core.content.PermissionChecker
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.photoeditor.databinding.ActivityMainBinding
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -40,7 +49,6 @@ class MainActivity : AppCompatActivity() {
 
     private var takePicture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
-    private var recording: Recording? = null
     private lateinit var cameraExecutor: ExecutorService
     private var cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -62,7 +70,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnTakePicture.setOnClickListener { takePhoto() }
-        binding.btnRecord.setOnClickListener { captureVideo() }
         binding.btnImageFolder.setOnClickListener {
             val intent = Intent(this, ImagesActivity::class.java)
             startActivity(intent)
@@ -130,86 +137,14 @@ class MainActivity : AppCompatActivity() {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    setResult( 1 , Intent().apply {
-                        data = output.savedUri
+                override fun onImageSaved(output: ImageCapture.OutputFileResults){
+                    setResult(Activity.RESULT_OK, Intent().apply {
+                       data = output.savedUri
                     })
                     finish()
                 }
             }
         )
-    }
-
-    // Implements VideoCapture use case, including start and stop capturing.
-    @SuppressLint("UseCompatLoadingForDrawables")
-    private fun captureVideo() {
-        val videoCapture = this.videoCapture ?: return
-
-        binding.btnRecord.isEnabled = false
-
-        val curRecording = recording
-        if (curRecording != null) {
-            // Stop the current recording session.
-            curRecording.stop()
-            recording = null
-            return
-        }
-
-        // create and start a new recording session
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
-            }
-        }
-
-        val mediaStoreOutputOptions = MediaStoreOutputOptions
-            .Builder(contentResolver, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-            .setContentValues(contentValues)
-            .build()
-        recording = videoCapture.output
-            .prepareRecording(this, mediaStoreOutputOptions)
-            .apply {
-                if (PermissionChecker.checkSelfPermission(this@MainActivity,
-                        Manifest.permission.RECORD_AUDIO) ==
-                    PermissionChecker.PERMISSION_GRANTED)
-                {
-                    withAudioEnabled()
-                }
-            }
-            .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
-                when(recordEvent) {
-                    is VideoRecordEvent.Start -> {
-                        binding.btnRecord.apply {
-                            background = getDrawable(R.drawable.stoprecord)
-                            isEnabled = true
-                        }
-                    }
-                    is VideoRecordEvent.Finalize -> {
-                        if (!recordEvent.hasError()) {
-                            val msg = "Video capture succeeded: " +
-                                    "${recordEvent.outputResults.outputUri}"
-                            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT)
-                                .show()
-                        } else {
-                            recording?.close()
-                            recording = null
-                            Log.e(TAG, "Video capture ends with error: " +
-                                    "${recordEvent.error}")
-                        }
-                        binding.btnRecord.apply {
-                            background = getDrawable(R.drawable.record)
-                            isEnabled = true
-                        }
-                    }
-                }
-            }
     }
 
     private fun flipCamera(){
@@ -239,15 +174,6 @@ class MainActivity : AppCompatActivity() {
 
             takePicture = ImageCapture.Builder()
                 .build()
-
-//            val imageAnalyzer = ImageAnalysis.Builder()
-//                .build()
-//                .also {
-//                    it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-//                        Log.d(TAG, "Average luminosity: $luma")
-//                    })
-//                }
-
 
             try {
                 // Unbind use cases before rebinding

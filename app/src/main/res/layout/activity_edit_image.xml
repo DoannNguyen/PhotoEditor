@@ -15,17 +15,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_toolbar_edit_image"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:textSize="16sp"
-                />
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_toolbar_edit_image"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"
+                    android:textSize="16sp"
+                    android:layout_weight="1"
+                    />
+                <ImageButton
+                    android:visibility="gone"
+                    android:id="@+id/btn_doneCrop"
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
+                    android:layout_margin="4sp"
+                    android:src="@drawable/check"
+                    android:layout_gravity="end"/>
+                <ImageButton
+                    android:visibility="gone"
+                    android:id="@+id/btn_doneDraw"
+                    android:layout_width="48sp"
+                    android:layout_height="48sp"
+                    android:layout_margin="4sp"
+                    android:src="@drawable/check"
+                    android:layout_gravity="end"
+                    />
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
         </androidx.appcompat.widget.Toolbar>
 
         <com.example.photoeditor.views.FlexibleImageView
+
             android:layout_gravity="center"
             android:id="@+id/img_preview"
             android:layout_width="match_parent"

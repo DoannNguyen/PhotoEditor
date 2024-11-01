@@ -6,9 +6,13 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
+import android.os.Environment
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 class DrawingView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -30,7 +34,8 @@ class DrawingView @JvmOverloads constructor(
 
     fun setBitmap(newBitmap: Bitmap) {
         bitmap = newBitmap
-        canvas = Canvas(newBitmap)
+        val mutableBitmap = newBitmap.copy(Bitmap.Config.ARGB_8888, true)
+        canvas = Canvas(mutableBitmap)
         invalidate()
     }
 
