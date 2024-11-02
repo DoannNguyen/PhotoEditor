@@ -42,13 +42,10 @@ class ImagesActivity : AppCompatActivity() {
                 }catch (e: Exception){
                     e.printStackTrace()
                 }
-
-
-
                 finish()
             }
         })
-        binding.rcvImages.layoutManager = GridLayoutManager(this, 4)
+        binding.rcvImages.layoutManager = GridLayoutManager(this, 3)
 
     }
 

@@ -11,13 +11,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
+        <ImageView
+            android:layout_width="28sp"
+            android:layout_height="28sp"
+            android:src="@drawable/back"
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_toolbar_list_image"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:layout_gravity="center"
-            android:textSize="16sp"
+            android:fontFamily="@font/itim_regular"
             />
     </Toolbar>
     <androidx.recyclerview.widget.RecyclerView
@@ -25,7 +31,7 @@
         android:id="@+id/rcvImages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:spanCount="4"
+        app:reverseLayout="true"
         />
 
 </LinearLayout>

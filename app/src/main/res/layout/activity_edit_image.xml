@@ -19,29 +19,54 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 >
+                <androidx.appcompat.widget.AppCompatButton
+                    android:visibility="gone"
+                    android:id="@+id/btn_undo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35sp"
+                    android:background="@drawable/border_layout"
+                    android:text="Hoan tac"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/itim_regular"
+
+                    />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_toolbar_edit_image"
                     android:textStyle="bold"
                     android:layout_gravity="center"
-                    android:textSize="16sp"
+                    android:textSize="24sp"
                     android:layout_weight="1"
+                    android:fontFamily="@font/itim_regular"
                     />
-                <ImageButton
+                <androidx.appcompat.widget.AppCompatImageView
                     android:visibility="gone"
+                    android:background="@drawable/border_layout"
                     android:id="@+id/btn_doneCrop"
-                    android:layout_width="48sp"
-                    android:layout_height="48sp"
-                    android:layout_margin="4sp"
+                    android:layout_width="32sp"
+                    android:layout_height="32sp"
+                    android:layout_marginEnd="12sp"
                     android:src="@drawable/check"
-                    android:layout_gravity="end"/>
-                <ImageButton
+                    android:layout_gravity="end"
+                    />
+                <androidx.appcompat.widget.AppCompatImageView
                     android:visibility="gone"
+                    android:background="@drawable/border_layout"
                     android:id="@+id/btn_doneDraw"
-                    android:layout_width="48sp"
-                    android:layout_height="48sp"
-                    android:layout_margin="4sp"
+                    android:layout_width="32sp"
+                    android:layout_height="32sp"
+                    android:layout_marginEnd="12sp"
+                    android:src="@drawable/check"
+                    android:layout_gravity="end"
+                    />
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:visibility="gone"
+                    android:background="@drawable/border_layout"
+                    android:id="@+id/btn_doneWrite"
+                    android:layout_width="32sp"
+                    android:layout_height="32sp"
+                    android:layout_marginEnd="12sp"
                     android:src="@drawable/check"
                     android:layout_gravity="end"
                     />
@@ -50,11 +75,11 @@
         </androidx.appcompat.widget.Toolbar>
 
         <com.example.photoeditor.views.FlexibleImageView
-
-            android:layout_gravity="center"
             android:id="@+id/img_preview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="16sp"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -62,30 +87,44 @@
         android:orientation="vertical"
         android:layout_gravity="bottom"
         >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="45sp"
             android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:paddingHorizontal="4sp"
+            android:layout_marginBottom="4sp"
+            android:background="@drawable/border_layout">
             <ImageButton
                 android:id="@+id/btn_crop"
-                android:layout_width="48sp"
-                android:layout_height="48sp"
+                android:layout_width="32sp"
+                android:layout_height="32sp"
                 android:background="@drawable/crop"
-                android:layout_marginHorizontal="5sp"
+                android:layout_marginHorizontal="12sp"
                 />
             <ImageButton
                 android:id="@+id/btn_draw"
-                android:layout_width="48sp"
-                android:layout_height="48sp"
+                android:layout_width="32sp"
+                android:layout_height="32sp"
                 android:background="@drawable/draw"
-                android:layout_marginHorizontal="5sp"
+                android:layout_marginHorizontal="12sp"
                 />
-        </LinearLayout>
-        <LinearLayout
+            <ImageButton
+                android:id="@+id/btn_write"
+                android:layout_width="32sp"
+                android:layout_height="32sp"
+                android:background="@drawable/write"
+                android:layout_marginHorizontal="12sp"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="65sp"
+            android:orientation="horizontal"
+            android:background="@drawable/border_layout"
+            android:layout_marginHorizontal="20sp"
+            android:gravity="center">
             <LinearLayout
                 android:id="@+id/layout_chooseImage"
                 android:layout_width="0sp"
@@ -98,12 +137,6 @@
                     android:layout_height="48sp"
                     android:src="@drawable/photo"
                     />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/choose_image"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/layout_takePicture"
@@ -117,15 +150,9 @@
                     android:layout_height="48sp"
                     android:src="@drawable/camera1"
                     />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/take_picture"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
             </LinearLayout>
 
-        </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

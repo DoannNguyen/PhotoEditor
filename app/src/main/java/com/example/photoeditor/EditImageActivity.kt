@@ -2,17 +2,14 @@ package com.example.photoeditor
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
-import android.net.Uri
+import androidx. exifinterface. media. ExifInterface
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -43,6 +40,10 @@ class EditImageActivity : AppCompatActivity() {
                 val adjustedBitmap = rotateBitmap(bitmap!!, orientation)
                 binding.imgPreview.setBitmap(adjustedBitmap)
                 binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
+                binding.btnUndo.visibility = View.GONE
+                binding.btnDoneCrop.visibility = View.GONE
+                binding.btnDoneDraw.visibility = View.GONE
+                binding.btnDoneWrite.visibility = View.GONE
 
             } catch (e: FileNotFoundException) {
                 Log.e("TAG", "File not found: ${e.message}")
@@ -65,9 +66,6 @@ class EditImageActivity : AppCompatActivity() {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
-
-
-
     private lateinit var binding: ActivityEditImageBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,11 +82,11 @@ class EditImageActivity : AppCompatActivity() {
 
         binding.layoutChooseImage.setOnClickListener{
             val intent = Intent(this, ImagesActivity::class.java)
-//            intent.type = "image/*"
             resultLauncher.launch(intent)
         }
-
-
+            val bitmapDefault = BitmapFactory.decodeResource(resources, R.drawable.default_image)
+            binding.imgPreview.setBitmap(bitmapDefault)
+            binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
 
         binding.layoutTakePicture.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -108,8 +106,16 @@ class EditImageActivity : AppCompatActivity() {
 
         binding.btnDraw.setOnClickListener {
             if(bitmap != null){
+                binding.btnUndo.visibility = View.VISIBLE
                 binding.btnDoneDraw.visibility = View.VISIBLE
                 binding.imgPreview.setMode(FlexibleImageView.Mode.DRAW)
+            }
+        }
+
+        binding.btnWrite.setOnClickListener {
+            if (bitmap != null){
+                binding.btnDoneWrite.visibility = View.VISIBLE
+                binding.imgPreview.setMode(FlexibleImageView.Mode.WRITE)
             }
         }
 
@@ -122,6 +128,17 @@ class EditImageActivity : AppCompatActivity() {
             binding.imgPreview.setAction(FlexibleImageView.Action.SaveCropped)
             binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
             binding.btnDoneCrop.visibility = View.GONE
+        }
+
+        binding.btnDoneWrite.setOnClickListener {
+            binding.imgPreview.setAction(FlexibleImageView.Action.SaveWrite)
+            binding.imgPreview.setMode(FlexibleImageView.Mode.VIEW)
+            binding.btnDoneWrite.visibility = View.GONE
+            binding.btnUndo.visibility = View.GONE
+        }
+
+        binding.btnUndo.setOnClickListener{
+            binding.imgPreview.setAction(FlexibleImageView.Action.UNDO)
         }
 
     }

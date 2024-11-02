@@ -54,12 +54,8 @@ class DrawingView @JvmOverloads constructor(
                 postScale(scale, scale)
                 postTranslate(dx, dy)
             }
-
-            // Draw the scaled and centered bitmap
             canvas.drawBitmap(it, matrix, null)
         }
-
-        // Draw the path
         canvas.drawPath(path!!, paint!!)
     }
 
@@ -84,5 +80,13 @@ class DrawingView @JvmOverloads constructor(
         }
         invalidate()
         return true
+    }
+
+    fun removeLastPath() {
+        if (path!!.isEmpty) {
+            return
+        }
+        path!!.reset()
+        invalidate()
     }
 }

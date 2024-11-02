@@ -13,8 +13,8 @@
         >
         <ImageView
             android:id="@+id/imgItem"
-            android:layout_width="100sp"
-            android:layout_height="120sp"
+            android:layout_width="125sp"
+            android:layout_height="165sp"
             />
         <CheckBox
             android:id="@+id/cbItem"

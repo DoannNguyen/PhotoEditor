@@ -33,22 +33,15 @@ class CroppingView @JvmOverloads constructor(
 
     fun setBitmap(newBitmap: Bitmap) {
         bitmap = newBitmap
-        initializeCropRect()
+
         invalidate()
     }
 
-    private fun initializeCropRect() {
-        bitmap?.let {
-            val centerX = (width - it.width) / 2f
-            val centerY = (height - it.height) / 2f
-            cropRect.set(centerX, centerY, centerX + it.width, centerY + it.height)
-        }
-    }
-
+    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         bitmap?.let {
-            // Tính toán tỷ lệ và vị trí để vẽ bitmap
+
             val viewWidth = width
             val viewHeight = height
             val scale = (viewWidth.toFloat() / it.width).coerceAtMost(viewHeight.toFloat() / it.height)
@@ -59,7 +52,6 @@ class CroppingView @JvmOverloads constructor(
             canvas.drawBitmap(it, null, RectF(dx, dy, dx + it.width * scale, dy + it.height * scale), null)
         }
 
-        // Vẽ hình chữ nhật cắt
         canvas.drawRect(cropRect, paint)
     }
 
@@ -86,11 +78,11 @@ class CroppingView @JvmOverloads constructor(
                 }
                 MotionEvent.ACTION_UP -> {
                     isDrawing = false
-                    // Có thể thêm logic để lưu đường cắt nếu cần
+
                     cropBitmap()
                 }
             }
-            invalidate() // Yêu cầu vẽ lại
+            invalidate()
         }
 
         return true
@@ -98,25 +90,22 @@ class CroppingView @JvmOverloads constructor(
 
     fun cropBitmap(): Bitmap? {
         bitmap?.let { bmp ->
-            // Tính toán tỷ lệ để điều chỉnh kích thước cắt
             val viewWidth = width.toFloat()
             val viewHeight = height.toFloat()
             val scale = (viewWidth / bmp.width).coerceAtMost(viewHeight / bmp.height)
 
-            // Tính toán vị trí cắt dựa trên tỷ lệ
             val x = ((cropRect.left - (viewWidth - bmp.width * scale) / 2) / scale).toInt()
             val y = ((cropRect.top - (viewHeight - bmp.height * scale) / 2) / scale).toInt()
             val width = ((cropRect.right - cropRect.left) / scale).toInt()
             val height = ((cropRect.bottom - cropRect.top) / scale).toInt()
 
-            // Đảm bảo rằng các giá trị không vượt quá kích thước của bitmap
             return Bitmap.createBitmap(bmp, x, y, width.coerceAtLeast(0), height.coerceAtLeast(0))
         }
         return null
     }
 
         fun clearCropRect() {
-        cropRect.setEmpty() // Xóa hình chữ nhật cắt
-        invalidate() // Yêu cầu vẽ lại
+        cropRect.setEmpty()
+        invalidate()
     }
 }
