@@ -7,3 +7,6 @@ PhotoEditor là 1 app edit và chụp ảnh. Uứng dụng được vết trên 
 3. Lưu trữ ảnh đã chụp 
 
 ## Giao diện app
+| |  |
+|---|---|
+|![Giao diện màn hình chính](./img/img.png)<h4 align="center">Giao diện màn hình chính</h4> |![Giao diện màn hình chọn ảnh](./img/img_1.png)<h4 align="center">Giao diện màn hình chọn ảnh</h4> |
